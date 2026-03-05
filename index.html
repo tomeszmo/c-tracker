@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Ciggy Calc</title>
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
     
     <style>
         :root {
-            --bg-color: #0a0a0a; /* Majdnem fekete sötétszürke */
-            --accent-red: #ff3b30; /* Apple-stílusú piros */
-            --text-color: #ffffff; /* Tiszta fehér */
+            --bg-color: #0a0a0a;
+            --accent-red: #ff3b30;
+            --text-color: #ffffff;
         }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
@@ -29,16 +30,26 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
+
         .container {
             text-align: center;
         }
+
         #amount {
             font-size: 3.8rem;
             font-weight: 700;
             margin-bottom: 2.5rem;
             letter-spacing: -1px;
+            transition: transform 0.1s ease-out, color 0.1s ease-out;
         }
-        /* Piros átmenetes nagy gomb */
+
+        /* Animáció a számhoz, amikor megnyomod a gombot */
+        .bump {
+            transform: scale(1.1);
+            color: var(--accent-red) !important;
+        }
+
+        /* Nagy piros átmenetes gomb */
         .main-btn {
             width: 240px;
             height: 240px;
@@ -49,15 +60,18 @@
             font-size: 1.6rem;
             font-weight: 800;
             box-shadow: 0 15px 35px rgba(255, 59, 48, 0.3);
-            transition: transform 0.1s;
+            transition: transform 0.1s, filter 0.1s;
             cursor: pointer;
             margin-bottom: 4rem;
             text-transform: uppercase;
         }
+
         .main-btn:active {
-            transform: scale(0.94);
-            filter: brightness(1.1);
+            transform: scale(0.92);
+            filter: brightness(1.3);
+            box-shadow: 0 0 50px rgba(255, 59, 48, 0.6);
         }
+
         /* Csak körvonalas visszavonás gomb */
         .undo-btn {
             background: transparent;
@@ -70,6 +84,7 @@
             cursor: pointer;
             transition: opacity 0.2s;
         }
+
         .undo-btn:active {
             background: rgba(255, 59, 48, 0.1);
             opacity: 0.7;
@@ -92,24 +107,20 @@
         let total = parseFloat(localStorage.getItem('ciggyTotal')) || 0;
         const price = 132.5;
 
+        // Első betöltéskor kiírjuk az értéket
         updateDisplay();
 
         function addCiggy() {
-            // Rezgés iPhone-on (Haptic Feedback)
-            if (window.navigator.vibrate) {
-                window.navigator.vibrate(15); 
-            }
             total += price;
             save();
+            animateText();
         }
 
         function undo() {
             if (total >= price) {
-                if (window.navigator.vibrate) {
-                    window.navigator.vibrate([10, 30, 10]); // Dupla rövid rezgés
-                }
                 total -= price;
                 save();
+                animateText();
             }
         }
 
@@ -119,8 +130,17 @@
         }
 
         function updateDisplay() {
-            // Magyar formátum (szóköz ezres elválasztóval)
-            document.getElementById('amount').innerText = total.toLocaleString('hu-HU', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + " Ft";
+            // Magyar formátum: szóköz ezres elválasztó, 1 tizedesjegy
+            document.getElementById('amount').innerText = total.toLocaleString('hu-HU', {
+                minimumFractionDigits: 1, 
+                maximumFractionDigits: 1
+            }) + " Ft";
+        }
+
+        function animateText() {
+            const el = document.getElementById('amount');
+            el.classList.add('bump');
+            setTimeout(() => el.classList.remove('bump'), 100);
         }
     </script>
 </body>
